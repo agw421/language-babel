@@ -3,6 +3,7 @@ autoCompleteJSX = require './auto-complete-jsx'
 autoCompleteStyledComponents = require './auto-complete-styled-components'
 AutoIndent = require './auto-indent'
 ttlGrammar = require './create-ttl-grammar'
+patchGrammars = require './patch-grammars'
 
 INTERFILESAVETIME = 1000
 LB = 'language-babel'
@@ -14,6 +15,7 @@ module.exports =
     # run observeStatusBarGrammarName until Atom has created the Status Bar Grammar Name DOM node
     observeStatusBarGrammarNameTimer = setInterval(@observeStatusBarGrammarName.bind(@), 1000)
     autoCompleteStyledComponents.loadProperties()
+    patchGrammars.watchGrammars()
     @transpiler ?= new (require './transpiler')
     @ttlGrammar = new ttlGrammar(true)
     # track any file save events and transpile if babel
@@ -64,6 +66,8 @@ module.exports =
     @transpiler.disposables.dispose()
     @ttlGrammar.destroy()
     @mutateStatusGrammarNameObserver?.disconnet()
+    patchGrammars.stopWatchGrammars()
+
 
   # warns if an activated package is on the incompatible list
   isPackageCompatible: (activatedPackage) ->
